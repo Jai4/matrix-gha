@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Run matrix
         run: |
-         npm install @actions/core
+         npm install -g @actions/core
          ls
          pwd
          node .github/workflows/test.js
