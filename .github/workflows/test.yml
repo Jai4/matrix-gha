@@ -58,6 +58,7 @@ jobs:
          npm install @actions/core
          ls
          pwd
+         node .github/workflows/test.js
       - name: Print Request
         run: |
           echo "Action: ${{ env.INPUT_ACTION }}"
