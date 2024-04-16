@@ -84,12 +84,12 @@ jobs:
   ring1-setup:
     runs-on: ubuntu-latest
     outputs:
-       region: ${{ steps.determine.outputs.region }}
-       sessionname: ${{ steps.determine.outputs.sessionname }}
+      matrix: ${{ steps.ring1.outputs.matrix }}
     steps:
       - name: Checkout the repo 
         uses: actions/checkout@v4
       - name: Run ring1 matrix setup
+        id: ring1
         run: |
          pwd
          ls -a
