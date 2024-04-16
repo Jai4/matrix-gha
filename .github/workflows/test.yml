@@ -156,3 +156,33 @@ jobs:
        run: |
           echo ${{ matrix.region }}
           echo ${{ matrix.sessionname }}
+
+  ring3-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.ring3.outputs.matrix }}
+    steps:
+      - name: ring3-matrix-config
+        id: ring3
+        run: |
+              if [ "${{ env.INPUT_DEPLOYMENT_RING1_REGION }}" == "jp" ]; then
+                echo "hello us"
+                echo "matrix={\"include\":[{\"region\":\"ap-northeast-1\",\"sessionname\":\"GithubActionsDeploySlsToProdJpFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+              if [ "${{ env.INPUT_DEPLOYMENT_RING1_REGION }}" == "all" ]; then
+                echo "hello us"
+                echo "matrix={\"include\":[{\"region\":\"ap-northeast-1\",\"sessionname\":\"GithubActionsDeploySlsToProdJpFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+  
+  production-ring3:
+   needs: [ring3-setup]
+   runs-on: ubuntu-latest
+   name: production-ring3
+   strategy:
+     fail-fast: false
+     matrix: ${{ fromJSON(needs.ring3-setup.outputs.matrix) }}
+   steps:
+     - name: Run tests
+       run: |
+          echo ${{ matrix.region }}
+          echo ${{ matrix.sessionname }}
