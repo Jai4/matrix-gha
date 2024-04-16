@@ -101,15 +101,15 @@ jobs:
       - name: Try bashing
         id: ring1bash
         run: |
-              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == 'us']; then
+              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == "us"]; then
                 echo "hello us"
                 echo "matrix={\"include\":[{\"region\":\"us-east-1\",\"sessionname\":\"GithubActionsDeploySlsToProdUsFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
               fi
-              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == 'au']; then
+              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == "au"]; then
                 echo "hello au"
                 echo "matrix={\"include\":[{\"region\":\"ap-southeast-2\",\"sessionname\":\"GithubActionsDeploySlsToProdAuFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
               fi
-              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == 'all']; then
+              if [ ${{ env.INPUT_DEPLOYMENT_RING1_REGION }} == "all"]; then
                 echo "hello all"
                 echo "matrix={\"include\":[{\"region\":\"us-east-1\",\"sessionname\":\"GithubActionsDeploySlsToProdUsFromCdPipeline\"}, {\"region\":\"ap-southeast-2\",\"sessionname\": \"GithubActionsDeploySlsToProdAuFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
               fi
