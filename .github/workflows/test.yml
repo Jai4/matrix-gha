@@ -32,12 +32,20 @@ on:
         - ring1
         - ring2
         - ring3
+      deployment-ring1-region:
+        description: 'Deploy to specific production region in ring1'
+        required: false
+        type: choice
+        options:
+        - us
+        - au
 
 env:
   INPUT_ACTION: ${{ github.event.inputs.action }}
   INPUT_REPO: ${{ github.event.inputs.repo }}
   INPUT_REF: ${{ github.event.inputs.ref }}
   INPUT_DEPLOYMENT_RING: ${{ github.event.inputs.deployment-ring }}
+  INPUT_DEPLOYMENT_RING1_REGION: ${{ github.event.inputs.deployment-ring1-region }}
   INPUT_PYTHON_VERSION: ${{ github.event.inputs.python-version }}
   ARTIFACT_LOC: s3://n1-ptp-artifacts/${{ github.event.inputs.repo }}/${{ github.event.inputs.ref }}
   N1_TICKET: ${{ github.event.inputs.ref }}
@@ -62,7 +70,7 @@ jobs:
          cd .github/workflows
          npm install @actions/core
          ls -a
-         node test.js
+         node test.js ${{ env.INPUT_DEPLOYMENT_RING }} ${{ env.INPUT_DEPLOYMENT_RING1_REGION }}
       - name: Print Request
         run: |
           echo "Action: ${{ env.INPUT_ACTION }}"
