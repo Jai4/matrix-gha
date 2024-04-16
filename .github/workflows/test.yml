@@ -85,21 +85,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.ring1.outputs.matrix }}
-      matrix-bashing: ${{ steps.ring1bash.outputs.matrix }}
     steps:
-      - name: Checkout the repo 
-        uses: actions/checkout@v4
-      - name: Run ring1 matrix setup
+      - name: ring1-matrix-config
         id: ring1
-        run: |
-         pwd
-         ls -a
-         cd .github/workflows
-         npm install @actions/core
-         ls -a
-         node test.js ${{ env.INPUT_DEPLOYMENT_RING }} ${{ env.INPUT_DEPLOYMENT_RING1_REGION }}
-      - name: Try bashing
-        id: ring1bash
         run: |
               if [ "${{ env.INPUT_DEPLOYMENT_RING1_REGION }}" == "us" ]; then
                 echo "hello us"
@@ -113,14 +101,6 @@ jobs:
                 echo "hello all"
                 echo "matrix={\"include\":[{\"region\":\"us-east-1\",\"sessionname\":\"GithubActionsDeploySlsToProdUsFromCdPipeline\"}, {\"region\":\"ap-southeast-2\",\"sessionname\": \"GithubActionsDeploySlsToProdAuFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
               fi
-      - name: Print Request
-        run: |
-          echo "Action: ${{ env.INPUT_ACTION }}"
-          echo "Serverless Repo: ${{ env.INPUT_REPO }}"
-          echo "Git Ref: ${{ env.INPUT_REF }}"
-          echo "Deployment ring: ${{ env.INPUT_DEPLOYMENT_RING}}"
-          echo "Python version: ${{ env.INPUT_PYTHON_VERSION }}"
-          echo "Package Artifact: ${{ env.ARTIFACT_LOC }}"
 
   production-ring1:
    needs: [ring1-setup]
@@ -128,7 +108,7 @@ jobs:
    name: production-ring1
    strategy:
      fail-fast: false
-     matrix: ${{ fromJSON(needs.ring1-setup.outputs.matrix-bashing) }}
+     matrix: ${{ fromJSON(needs.ring1-setup.outputs.matrix) }}
    steps:
      - name: Run tests
        run: |
