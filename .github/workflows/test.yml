@@ -81,7 +81,7 @@ permissions:
   id-token: write # Required for OIDC auth with AWS
 
 jobs:
-  setup:
+  ring1-setup:
     runs-on: ubuntu-latest
     outputs:
        region: ${{ steps.determine.outputs.region }}
@@ -105,5 +105,17 @@ jobs:
           echo "Deployment ring: ${{ env.INPUT_DEPLOYMENT_RING}}"
           echo "Python version: ${{ env.INPUT_PYTHON_VERSION }}"
           echo "Package Artifact: ${{ env.ARTIFACT_LOC }}"
-  
-      
+
+  production-ring1:
+   needs: [ring1-setup]
+   runs-on: ubuntu-latest
+   name: production-ring1
+   strategy:
+     fail-fast: false
+     matrix: ${{ fromJSON(needs.ring1-setup.outputs.matrix) }}
+
+   steps:
+     - name: Run tests
+       run: |
+          echo ${{ matrix.region }}
+          echo ${{ matrix.sessionname }}
