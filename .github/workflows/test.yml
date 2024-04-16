@@ -1,0 +1,69 @@
+name: test-run
+
+on:
+  workflow_dispatch:
+    inputs:
+      action: # deploy or remove
+        description: 'To deploy or remove app'
+        required: true
+        type: choice
+        default: deploy
+        options:
+        - deploy
+        - remove
+      repo:
+        description: 'Serverless Repo to deploy/remove (under cloud-one-network)'
+        required: true
+        type: string
+      ref:
+        description: 'Serverless Repo tag to deploy/remove'
+        required: true
+        type: string
+      python-version:
+        description: 'Python version for repo ref without .python-version file'
+        required: false
+        type: string
+        default: ''
+      deployment-ring:
+        description: 'Deploy to specific production region(s). Ring1 for US and AU. Ring2 for EU, IN, SG and MEA. Ring3 for JP.'
+        required: true
+        type: choice
+        options:
+        - ring1
+        - ring2
+        - ring3
+
+env:
+  INPUT_ACTION: ${{ github.event.inputs.action }}
+  INPUT_REPO: ${{ github.event.inputs.repo }}
+  INPUT_REF: ${{ github.event.inputs.ref }}
+  INPUT_DEPLOYMENT_RING: ${{ github.event.inputs.deployment-ring }}
+  INPUT_PYTHON_VERSION: ${{ github.event.inputs.python-version }}
+  ARTIFACT_LOC: s3://n1-ptp-artifacts/${{ github.event.inputs.repo }}/${{ github.event.inputs.ref }}
+  N1_TICKET: ${{ github.event.inputs.ref }}
+
+run-name: ${{ github.event.inputs.repo }} ${{ github.event.inputs.ref }}
+
+permissions:
+  actions: read # Get job info for workflow run
+  contents: read  # Checkout repo
+  id-token: write # Required for OIDC auth with AWS
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run matrix
+        run: |
+         npm install @actions/core
+         node ./test.js
+      - name: Print Request
+        run: |
+          echo "Action: ${{ env.INPUT_ACTION }}"
+          echo "Serverless Repo: ${{ env.INPUT_REPO }}"
+          echo "Git Ref: ${{ env.INPUT_REF }}"
+          echo "Deployment ring: ${{ env.INPUT_DEPLOYMENT_RING}}"
+          echo "Python version: ${{ env.INPUT_PYTHON_VERSION }}"
+          echo "Package Artifact: ${{ env.ARTIFACT_LOC }}"
+  
+      
