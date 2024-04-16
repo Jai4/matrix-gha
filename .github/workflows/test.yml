@@ -36,10 +36,30 @@ on:
         description: 'Deploy to specific production region in ring1'
         required: false
         type: choice
+        default: all
         options:
-        - none
+        - all
         - us
         - au
+      deployment-ring2-region:
+        description: 'Deploy to specific production region in ring2'
+        required: false
+        type: choice
+        default: all
+        options:
+        - all
+        - sg
+        - in
+        - eu
+      deployment-ring3-region:
+        description: 'Deploy to specific production region in ring3'
+        required: false
+        type: choice
+        default: all
+        options:
+        - all
+        - jp
+        - mae
 
 env:
   INPUT_ACTION: ${{ github.event.inputs.action }}
@@ -47,6 +67,8 @@ env:
   INPUT_REF: ${{ github.event.inputs.ref }}
   INPUT_DEPLOYMENT_RING: ${{ github.event.inputs.deployment-ring }}
   INPUT_DEPLOYMENT_RING1_REGION: ${{ github.event.inputs.deployment-ring1-region }}
+  INPUT_DEPLOYMENT_RING2_REGION: ${{ github.event.inputs.deployment-ring2-region }}
+  INPUT_DEPLOYMENT_RING3_REGION: ${{ github.event.inputs.deployment-ring3-region }}
   INPUT_PYTHON_VERSION: ${{ github.event.inputs.python-version }}
   ARTIFACT_LOC: s3://n1-ptp-artifacts/${{ github.event.inputs.repo }}/${{ github.event.inputs.ref }}
   N1_TICKET: ${{ github.event.inputs.ref }}
@@ -61,10 +83,13 @@ permissions:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+       region: ${{ steps.determine.outputs.region }}
+       sessionname: ${{ steps.determine.outputs.sessionname }}
     steps:
       - name: Checkout the repo 
         uses: actions/checkout@v4
-      - name: Run matrix
+      - name: Run ring1 matrix setup
         run: |
          pwd
          ls -a
