@@ -33,7 +33,7 @@ on:
         - ring2
         - ring3
       deployment-ring1-region:
-        description: 'Deploy to specific production region in ring1'
+        description: 'Deploy to specific production region(s) in ring1. Possible options: us,au,all'
         required: false
         type: choice
         default: all
@@ -42,7 +42,7 @@ on:
         - us
         - au
       deployment-ring2-region:
-        description: 'Deploy to specific production region in ring2'
+        description: 'Deploy to specific production region(s) in ring2. Possible options: sg,in,eu,mae,all'
         required: false
         type: choice
         default: all
@@ -51,15 +51,16 @@ on:
         - sg
         - in
         - eu
+        - mae
       deployment-ring3-region:
-        description: 'Deploy to specific production region in ring3'
+        description: 'Deploy to specific production region(s) in ring3. Possible options: jp,all'
         required: false
         type: choice
         default: all
         options:
         - all
         - jp
-        - mae
+        
 
 env:
   INPUT_ACTION: ${{ github.event.inputs.action }}
@@ -109,6 +110,47 @@ jobs:
    strategy:
      fail-fast: false
      matrix: ${{ fromJSON(needs.ring1-setup.outputs.matrix) }}
+   steps:
+     - name: Run tests
+       run: |
+          echo ${{ matrix.region }}
+          echo ${{ matrix.sessionname }}
+
+  ring2-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.ring2.outputs.matrix }}
+    steps:
+      - name: ring2-matrix-config
+        id: ring2
+        run: |
+              if [ "${{ env.INPUT_DEPLOYMENT_RING2_REGION }}" == "in" ]; then
+                echo "hello us"
+                echo "matrix={\"include\":[{\"region\":\"ap-south-1\",\"sessionname\":\"GithubActionsDeploySlsToProdInFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+              if [ "${{ env.INPUT_DEPLOYMENT_RING2_REGION }}" == "eu" ]; then
+                echo "hello au"
+                echo "matrix={\"include\":[{\"region\":\"eu-central-1\",\"sessionname\":\"GithubActionsDeploySlsToProdEuFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+              if [ "${{ env.INPUT_DEPLOYMENT_RING2_REGION }}" == "sg" ]; then
+                echo "hello au"
+                echo "matrix={\"include\":[{\"region\":\"ap-southeast-1\",\"sessionname\":\"GithubActionsDeploySlsToProdSgFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+              if [ "${{ env.INPUT_DEPLOYMENT_RING2_REGION }}" == "mae" ]; then
+                echo "hello au"
+                echo "matrix={\"include\":[{\"region\":\"me-central-1\",\"sessionname\":\"GithubActionsDeploySlsToProdMeFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+              if [ "${{ env.INPUT_DEPLOYMENT_RING2_REGION }}" == "all" ]; then
+                echo "hello all"
+                echo "matrix={\"include\":[{\"region\":\"ap-south-1\",\"sessionname\":\"GithubActionsDeploySlsToProdInFromCdPipeline\"}, {\"region\":\"eu-central-1\",\"sessionname\": \"GithubActionsDeploySlsToProdEuFromCdPipeline\"}, {\"region\":\"ap-southeast-1\",\"sessionname\": \"GithubActionsDeploySlsToProdSgFromCdPipeline\"},{\"region\":\"me-central-1\",\"sessionname\": \"GithubActionsDeploySlsToProdMeFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
+              fi
+  production-ring2:
+   needs: [ring2-setup]
+   runs-on: ubuntu-latest
+   name: production-ring2
+   strategy:
+     fail-fast: false
+     matrix: ${{ fromJSON(needs.ring2-setup.outputs.matrix) }}
    steps:
      - name: Run tests
        run: |
