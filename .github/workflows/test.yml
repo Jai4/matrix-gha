@@ -83,6 +83,7 @@ permissions:
 
 jobs:
   ring1-setup:
+    if: ${{ github.event.inputs.deployment-ring == 'ring1' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.ring1.outputs.matrix }}
@@ -104,6 +105,7 @@ jobs:
               fi
 
   production-ring1:
+   if: ${{ github.event.inputs.deployment-ring == 'ring1' }}
    needs: [ring1-setup]
    runs-on: ubuntu-latest
    name: production-ring1
@@ -117,6 +119,7 @@ jobs:
           echo ${{ matrix.sessionname }}
 
   ring2-setup:
+    if: ${{ github.event.inputs.deployment-ring == 'ring2' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.ring2.outputs.matrix }}
@@ -145,6 +148,7 @@ jobs:
                 echo "matrix={\"include\":[{\"region\":\"ap-south-1\",\"sessionname\":\"GithubActionsDeploySlsToProdInFromCdPipeline\"}, {\"region\":\"eu-central-1\",\"sessionname\": \"GithubActionsDeploySlsToProdEuFromCdPipeline\"}, {\"region\":\"ap-southeast-1\",\"sessionname\": \"GithubActionsDeploySlsToProdSgFromCdPipeline\"},{\"region\":\"me-central-1\",\"sessionname\": \"GithubActionsDeploySlsToProdMeFromCdPipeline\"}]}" >> $GITHUB_OUTPUT
               fi
   production-ring2:
+   if: ${{ github.event.inputs.deployment-ring == 'ring2' }}
    needs: [ring2-setup]
    runs-on: ubuntu-latest
    name: production-ring2
@@ -158,6 +162,7 @@ jobs:
           echo ${{ matrix.sessionname }}
 
   ring3-setup:
+    if: ${{ github.event.inputs.deployment-ring == 'ring3' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.ring3.outputs.matrix }}
@@ -175,6 +180,7 @@ jobs:
               fi
   
   production-ring3:
+   if: ${{ github.event.inputs.deployment-ring == 'ring3' }}
    needs: [ring3-setup]
    runs-on: ubuntu-latest
    name: production-ring3
