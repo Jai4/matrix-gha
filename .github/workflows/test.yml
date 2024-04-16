@@ -55,15 +55,8 @@ jobs:
     steps:
       - name: Run matrix
         run: |
-         ls -a
          pwd
-         cd .github
          ls -a
-         cd workflows
-         ls -a
-         npm install @actions/core
-         ls -a
-         
       - name: Print Request
         run: |
           echo "Action: ${{ env.INPUT_ACTION }}"
